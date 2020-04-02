@@ -1,5 +1,5 @@
 <template>
-  <div class="home">
+  <div class="login">
     <img alt="Vue logo" src="@/assets/img/logo.png">
     <div>
       <p>authority vue Router</p>
@@ -29,7 +29,7 @@
 
 <script>
 export default {
-  name: 'Home',
+  name: 'Login',
   components: {},
   data () {
     return {
@@ -48,6 +48,8 @@ export default {
         }
       ],
       form: {
+        name: '',
+        password: '',
         type: 2
       },
       rules: {
@@ -67,13 +69,38 @@ export default {
     onSubmit (formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          alert('submit!')
+          this.login()
         } else {
           console.log('error submit!!')
           return false
         }
       })
+    },
+    async login () {
+      const res = await this.$axios.post('/api/authorityRouter/login', this.form)
+      if (res.status && res.status === 200) {
+        if (res.data.isok) {
+          this.$store.commit('setLoginFlag', true)
+          this.$store.commit('setAuthorityType', this.form.type)
+          this.$cookies.set('authorityRouterType', this.form.type, { expires: 7, path: '' })
+          if (this.$route.query.redirect) {
+            this.$router.push(this.$route.query.redirect)
+          } else {
+            this.$router.push('/')
+          }
+        } else {
+          this.$message.error('登录失败')
+        }
+      } else {
+        this.$message.error('网络出错，请重试')
+      }
     }
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.login {
+  margin-top: 60px;
+}
+</style>
