@@ -1,6 +1,5 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import { asyncRoutesBase } from '@/router/dynamicRoutes/index'
 const Login = () => import('../views/Login.vue')
 
 Vue.use(VueRouter)
@@ -17,21 +16,18 @@ const publicRoutes = [
   }
 ]
 
-const createRouter = (flag) => {
-  const routes = flag ? [...publicRoutes, ...asyncRoutesBase] : publicRoutes
-  return new VueRouter({
-    routes,
-    scrollBehavior (to, from, savedPosition) {
-      if (savedPosition) {
-        return savedPosition
-      } else {
-        return { x: 0, y: 0 }
-      }
+const createRouter = () => new VueRouter({
+  routes: publicRoutes,
+  scrollBehavior (to, from, savedPosition) {
+    if (savedPosition) {
+      return savedPosition
+    } else {
+      return { x: 0, y: 0 }
     }
-  })
-}
+  }
+})
 
-const router = createRouter(true)
+const router = createRouter()
 
 // Detail see: https://github.com/vuejs/vue-router/issues/1234#issuecomment-357941465
 function resetRouter () {
