@@ -12,14 +12,8 @@
            <el-menu
             :default-active="menuActive"
             :router="true">
-            <el-menu-item index="1" route="/base">
-              <span slot="title">基本</span>
-            </el-menu-item>
-            <el-menu-item index="2" route="/vip">
-              <span slot="title">VIP</span>
-            </el-menu-item>
-            <el-menu-item index="3" route="/admin">
-              <span slot="title">管理员</span>
+            <el-menu-item v-for="item in menuRoutes" :key="item.name" :route="`/${item.path}`" :index="item.name">
+              <span slot="title">{{ item.meta.title }}</span>
             </el-menu-item>
           </el-menu>
         </el-aside>
@@ -43,6 +37,14 @@ export default {
   },
   computed: {
     ...mapState(['authorityType']),
+    ...mapState('permission', ['asyncRoutes', 'accessedRoutes']),
+    menuRoutes () {
+      if (this.accessedRoutes.length) {
+        return this.accessedRoutes[0].children
+      } else {
+        return []
+      }
+    },
     authorityTypeText () {
       let res
       switch (this.authorityType) {
@@ -64,35 +66,18 @@ export default {
   },
   watch: {
     '$route.path' (val) {
-      this.menuActive = this.getmenuActive()
+      this.menuActive = this.$route.name
     }
   },
   created () {
-    this.menuActive = this.getmenuActive()
+    this.menuActive = this.$route.name
   },
   methods: {
-    getmenuActive () {
-      let res
-      switch (this.$route.path) {
-        case '/base':
-          res = '1'
-          break
-        case '/vip':
-          res = '2'
-          break
-        case '/admin':
-          res = '3'
-          break
-        default:
-          res = '1'
-          break
-      }
-      return res
-    },
     logout () {
       this.$store.commit('setLoginFlag', false)
       this.$store.commit('setAuthorityType', null)
       this.$cookies.remove('authorityRouterType', { path: '' })
+      this.$store.dispatch('permission/logout')
       this.$router.push('/login')
     }
   }

@@ -1,69 +1,46 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
+import { asyncRoutesBase } from '@/router/dynamicRoutes/index'
 const Login = () => import('../views/Login.vue')
-const Admin = () => import('../views/Admin.vue')
-const AdminBase = () => import('../views/AdminBase.vue')
-const AdminVip = () => import('../views/AdminVip.vue')
-const AdminAdmin = () => import('../views/AdminAdmin.vue')
 
 Vue.use(VueRouter)
 
-const routes = [
+const publicRoutes = [
   {
     path: '/login',
     name: 'Login',
     component: Login,
     meta: {
+      title: '登录',
       requiresAuth: false
     }
-  },
-  {
-    path: '/',
-    name: 'Admin',
-    component: Admin,
-    meta: {
-      requiresAuth: true
-    },
-    redirect: '/base',
-    children: [
-      {
-        path: 'base',
-        name: 'AdminBase',
-        component: AdminBase,
-        meta: {
-          requiresAuth: true,
-          authority: 2
-        }
+  }
+]
+
+const createRouter = (flag) => {
+  const routes = flag ? [...publicRoutes, ...asyncRoutesBase] : publicRoutes
+  return new VueRouter({
+    routes,
+    scrollBehavior (to, from, savedPosition) {
+      if (savedPosition) {
+        return savedPosition
+      } else {
+        return { x: 0, y: 0 }
       }
-    ]
-  }
-]
-
-const router = new VueRouter({
-  routes
-})
-
-const asyncRouters = [
-  {
-    path: 'vip',
-    name: 'AdminVip',
-    component: AdminVip,
-    meta: {
-      requiresAuth: true
     }
-  },
-  {
-    path: 'admin',
-    name: 'AdminAdmin',
-    component: AdminAdmin,
-    meta: {
-      requiresAuth: true
-    }
-  }
-]
+  })
+}
+
+const router = createRouter(true)
+
+// Detail see: https://github.com/vuejs/vue-router/issues/1234#issuecomment-357941465
+function resetRouter () {
+  const newRouter = createRouter()
+  router.matcher = newRouter.matcher // reset router
+}
 
 export default router
 export {
-  routes,
-  asyncRouters
+  publicRoutes,
+  resetRouter
 }

@@ -28,6 +28,8 @@
 </template>
 
 <script>
+import router, { resetRouter } from '@/router'
+
 export default {
   name: 'Login',
   components: {},
@@ -83,11 +85,20 @@ export default {
           this.$store.commit('setLoginFlag', true)
           this.$store.commit('setAuthorityType', this.form.type)
           this.$cookies.set('authorityRouterType', this.form.type, { expires: 7, path: '' })
-          if (this.$route.query.redirect) {
-            this.$router.push(this.$route.query.redirect)
-          } else {
-            this.$router.push('/')
-          }
+
+          resetRouter()
+          // generate accessible routes map based on roles
+          const accessRoutes = await this.$store.dispatch('permission/getRouter', this.form.type)
+          // dynamically add accessible routes
+          router.addRoutes(accessRoutes)
+
+          this.$nextTick(() => {
+            if (this.$route.query.redirect) {
+              this.$router.push(this.$route.query.redirect)
+            } else {
+              this.$router.push('/')
+            }
+          })
         } else {
           this.$message.error('登录失败')
         }
