@@ -12,7 +12,7 @@ function hasPermission (role, route) {
 }
 
 /**
- * Filter asynchronous routing tables by recursion
+ * 对路由进行筛选
  */
 export function filterAsyncRoutes (routes, role) {
   const res = []
@@ -42,6 +42,7 @@ export default {
     setAsyncRoutes (state, asyncRoutes) {
       asyncRoutes = [asyncRoutes]
       formatAsyncRoute(asyncRoutes)
+      // 将基础路由添加进去
       state.asyncRoutes = asyncRoutes.concat(asyncRoutesBase)
     },
     setAccessedRoutes (state, accessedRoutes) {
@@ -53,6 +54,7 @@ export default {
   },
   actions: {
     async getRouter ({ commit, state }, type) {
+      // 根据用户类型获取路由信息
       const res = await Vue.axios.post('/api/authorityRouter/getRouter', {
         type
       })
@@ -61,6 +63,7 @@ export default {
           commit('setAsyncRoutes', res.data.data)
           return new Promise(resolve => {
             let accessedRoutes
+            // 这里 type = 0 表示管理员
             if (type === 0) {
               accessedRoutes = state.asyncRoutes || {}
             } else {
@@ -77,6 +80,7 @@ export default {
       }
     },
     logout ({ commit, state }) {
+      // 退出登录
       resetRouter()
       commit('resetAsyncRoutes')
       commit('setAccessedRoutes', [])

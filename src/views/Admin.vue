@@ -40,6 +40,7 @@ export default {
     ...mapState('permission', ['asyncRoutes', 'accessedRoutes']),
     menuRoutes () {
       if (this.accessedRoutes.length) {
+        // 这里请根据具体情况定
         return this.accessedRoutes[0].children
       } else {
         return []

@@ -4,6 +4,7 @@ const Login = () => import('../views/Login.vue')
 
 Vue.use(VueRouter)
 
+// 公共路由，和路由白名单里的路由信息一致
 const publicRoutes = [
   {
     path: '/login',
@@ -16,6 +17,7 @@ const publicRoutes = [
   }
 ]
 
+// 生成信息的公共路由
 const createRouter = () => new VueRouter({
   routes: publicRoutes,
   scrollBehavior (to, from, savedPosition) {

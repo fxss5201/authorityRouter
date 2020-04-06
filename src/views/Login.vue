@@ -79,20 +79,21 @@ export default {
       })
     },
     async login () {
+      // 模拟登录
       const res = await this.$axios.post('/api/authorityRouter/login', this.form)
       if (res.status && res.status === 200) {
         if (res.data.isok) {
           this.$store.commit('setLoginFlag', true)
           this.$store.commit('setAuthorityType', this.form.type)
           this.$cookies.set('authorityRouterType', this.form.type, { expires: 7, path: '' })
-
+          // 重置router
           resetRouter()
-          // generate accessible routes map based on roles
+          // 根据权限得到可用的路由信息
           const accessRoutes = await this.$store.dispatch('permission/getRouter', this.form.type)
-          // dynamically add accessible routes
           router.addRoutes(accessRoutes)
 
           this.$nextTick(() => {
+            // 处理从其他页面页面跳往登录页面的情况
             if (this.$route.query.redirect) {
               this.$router.push(this.$route.query.redirect)
             } else {
